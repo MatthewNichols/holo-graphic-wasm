@@ -1,10 +1,15 @@
 use crate::js_bridge;
+use js_sys::Math;
 
 pub fn draw() {
     init("canvas1", 1000, 1000);
     clear("#fff");
-    let c = Circle::new(300, 250, 60, Color::new(0xff, 0x00, 0xff, 0.3));
-    draw_circle(c);
+
+    for _ in 0..500 {
+        let c = get_random_circle();
+        draw_circle(c);    
+    }
+    
 }
 
 pub fn init(canvas_id: &str, height: i32, width: i32) {
@@ -17,6 +22,24 @@ pub fn clear(color_code: &str) {
 
 pub fn draw_circle(circle: Circle) {
     js_bridge::drawCircle(circle.center_x, circle.center_y, circle.radius, circle.color.red, circle.color.green, circle.color.blue, circle.color.alpha);
+}
+
+fn random_int(min: i32, max: i32) -> i32 {
+    let range = max - min;
+    ((Math::random() * (range as f64)) as i32) + min
+}
+
+fn random_int_around_point(center: i32, radius: i32) -> i32 {
+    random_int(center - radius, center + radius)
+}
+
+fn get_random_circle() -> Circle {
+    let c = Circle::new(
+        random_int_around_point(500, 300), 
+        random_int_around_point(500, 250), 
+        random_int(0, 60), 
+        Color::new(0xff, 0x00, 0xff, 0.3));
+    c
 }
 
 pub struct Circle {
