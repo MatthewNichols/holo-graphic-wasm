@@ -23,9 +23,9 @@ export function clear(colorCode) {
     context.fillRect(0, 0, canvasWidth, canvasHeight);
 }
 
-export function drawCircle(centerX, centerY, radius, color) {
+export function drawCircle(centerX, centerY, radius, colorR, colorG, colorB, colorA) {
     context.beginPath();
     context.arc(centerX, centerY, radius, 0, Math.PI * 2, false);
-    context.fillStyle = color;
+    context.fillStyle = `rgba(${colorR}, ${colorG}, ${colorB}, ${colorA})`;
     context.fill();
 }
