@@ -66,11 +66,11 @@ impl Pallette {
     }
 
     fn pick_random_color(&self) -> Color {
-        self.colors[random_int(0, 2) as usize]
+        self.colors[random_index(2)]
     }
     
     fn pick_random_size(&self) -> i32 {
-        self.sizes[random_int(0, self.sizes.len() as i32) as usize].radius
+        self.sizes[random_index(self.sizes.len() as i32)].radius
     }
 }
 
@@ -78,13 +78,8 @@ fn random_angle() -> f64 {
     Math::random() * 2.0 * std::f64::consts::PI 
 }
 
-fn random_int(min: i32, max: i32) -> i32 {
-    let range = max - min;
-    ((Math::random() * (range as f64)) as i32) + min
-}
-
-fn random_int_around_point(center: i32, radius: i32) -> i32 {
-    random_int(center - radius, center + radius)
+fn random_index(max: i32) -> usize {
+    (Math::random() * (max as f64)) as usize
 }
 
 #[derive(Clone, Copy)]
