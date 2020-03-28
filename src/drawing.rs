@@ -2,26 +2,49 @@ use crate::js_bridge;
 use js_sys::Math;
 
 pub fn draw() {
-    init("canvas1", 1000, 1000);
-    clear("#fff");
+    let pallette = Pallette::new();
+
+    pallette.init("canvas1", 1000, 1000);
+    pallette.clear("#fff");
 
     for _ in 0..500 {
-        let c = get_random_circle();
-        draw_circle(c);    
+        let c = pallette.get_random_circle();
+        pallette.draw_circle(c);    
     }
     
 }
 
-pub fn init(canvas_id: &str, height: i32, width: i32) {
-    js_bridge::init(canvas_id, height, width);
+struct Pallette {
+    colors: Vec<Color>,
 }
 
-pub fn clear(color_code: &str) {
-    js_bridge::clear(color_code);
-}
+impl Pallette {
+    pub fn new() -> Pallette {
+        Pallette {
+            colors: vec![Color::new(0xff, 0x00, 0xff, 0.3)]
+        }
+    }
 
-pub fn draw_circle(circle: Circle) {
-    js_bridge::drawCircle(circle.center_x, circle.center_y, circle.radius, circle.color.red, circle.color.green, circle.color.blue, circle.color.alpha);
+    pub fn init(&self, canvas_id: &str, height: i32, width: i32) {
+        js_bridge::init(canvas_id, height, width);
+    }
+    
+    pub fn clear(&self, color_code: &str) {
+        js_bridge::clear(color_code);
+    }
+    
+    pub fn draw_circle(&self, circle: Circle) {
+        js_bridge::drawCircle(circle.center_x, circle.center_y, circle.radius, circle.color.red, circle.color.green, circle.color.blue, circle.color.alpha);
+    }
+    
+    fn get_random_circle(&self) -> Circle {
+        let c = Circle::new(
+            random_int_around_point(500, 300), 
+            random_int_around_point(500, 250), 
+            random_int(0, 60), 
+            Color::new(0xff, 0x00, 0xff, 0.3));
+        c
+    }    
 }
 
 fn random_int(min: i32, max: i32) -> i32 {
@@ -31,15 +54,6 @@ fn random_int(min: i32, max: i32) -> i32 {
 
 fn random_int_around_point(center: i32, radius: i32) -> i32 {
     random_int(center - radius, center + radius)
-}
-
-fn get_random_circle() -> Circle {
-    let c = Circle::new(
-        random_int_around_point(500, 300), 
-        random_int_around_point(500, 250), 
-        random_int(0, 60), 
-        Color::new(0xff, 0x00, 0xff, 0.3));
-    c
 }
 
 pub struct Circle {
