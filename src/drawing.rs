@@ -16,6 +16,7 @@ pub fn draw() {
 
 struct Pallette {
     colors: Vec<Color>,
+    sizes: Vec<CircleSize>
 }
 
 impl Pallette {
@@ -25,6 +26,12 @@ impl Pallette {
                 Color::new(20, 151, 162, 1.0),
                 Color::new(74, 59, 142, 1.0),
                 Color::new(21, 119, 78, 1.0),
+            ],
+            sizes: vec![
+                CircleSize { radius: 17, weight: 10 },
+                CircleSize { radius: 12, weight: 10 },
+                CircleSize { radius: 8, weight: 12 },
+                CircleSize { radius: 5, weight: 12 },
             ]
         }
     }
@@ -45,11 +52,19 @@ impl Pallette {
         let c = Circle::new(
             random_int_around_point(500, 300), 
             random_int_around_point(500, 250), 
-            random_int(0, 60), 
-            self.colors[random_int(0, 2) as usize]
+            self.pick_random_size(), 
+            self.pick_random_color()
         );
         c
-    }    
+    }
+
+    fn pick_random_color(&self) -> Color {
+        self.colors[random_int(0, 2) as usize]
+    }
+    
+    fn pick_random_size(&self) -> i32 {
+        self.sizes[random_int(0, self.sizes.len() as i32) as usize].radius
+    }
 }
 
 fn random_int(min: i32, max: i32) -> i32 {
@@ -86,4 +101,10 @@ impl Color {
     pub fn new(red: u8, green: u8, blue: u8, alpha: f32) -> Color {
         Color { red, green, blue, alpha }
     }
+}
+
+#[derive(Clone, Copy)]
+pub struct CircleSize {
+    radius: i32,
+    weight: i32
 }
