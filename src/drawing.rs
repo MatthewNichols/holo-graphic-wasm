@@ -2,21 +2,19 @@ use crate::js_bridge;
 use js_sys::Math;
 
 pub fn draw() {
-    let pallette = Pallette::new();
+    let mut pallette = Pallette::new();
 
     pallette.init("canvas1", 1000, 1000);
     pallette.clear("#fff");
 
-    for _ in 0..500 {
-        let c = pallette.get_random_circle();
-        pallette.draw_circle(c);    
-    }
+    pallette.draw_circles_within_circle(Coordinates(500, 500), 200, 200);
     
 }
 
 struct Pallette {
     colors: Vec<Color>,
-    sizes: Vec<CircleSize>
+    sizes: Vec<CircleSize>,
+    circles: Vec<Circle>,
 }
 
 impl Pallette {
@@ -32,7 +30,8 @@ impl Pallette {
                 CircleSize { radius: 12, weight: 10 },
                 CircleSize { radius: 8, weight: 12 },
                 CircleSize { radius: 5, weight: 12 },
-            ]
+            ],
+            circles: vec![]
         }
     }
 
@@ -44,17 +43,25 @@ impl Pallette {
         js_bridge::clear(color_code);
     }
     
+    pub fn draw_circles_within_circle(&mut self, center: Coordinates, max_distance_from_center: i32, number_of_attempts: i32) {
+        for _ in 0..number_of_attempts {
+            let c = self.get_random_circle(center, max_distance_from_center);
+            self.draw_circle(c);
+            self.circles.push(c);    
+        }
+    }
+
     pub fn draw_circle(&self, circle: Circle) {
         js_bridge::drawCircle(circle.center_x, circle.center_y, circle.radius, circle.color.red, circle.color.green, circle.color.blue, circle.color.alpha);
     }
     
-    fn get_random_circle(&self) -> Circle {
-        let c = Circle::new(
-            random_int_around_point(500, 300), 
-            random_int_around_point(500, 250), 
-            self.pick_random_size(), 
-            self.pick_random_color()
-        );
+    fn get_random_circle(&self, center: Coordinates, max_distance_from_center: i32) -> Circle {
+        let angle = random_angle();
+        let distance_from_center = Math::random() * max_distance_from_center as f64;
+
+        let x = (distance_from_center * angle.cos()) as i32 + center.0;
+        let y = (distance_from_center * angle.sin()) as i32 + center.1;
+        let c = Circle::new(x, y, self.pick_random_size(), self.pick_random_color());
         c
     }
 
@@ -67,6 +74,10 @@ impl Pallette {
     }
 }
 
+fn random_angle() -> f64 {
+    Math::random() * 2.0 * std::f64::consts::PI 
+}
+
 fn random_int(min: i32, max: i32) -> i32 {
     let range = max - min;
     ((Math::random() * (range as f64)) as i32) + min
@@ -76,6 +87,10 @@ fn random_int_around_point(center: i32, radius: i32) -> i32 {
     random_int(center - radius, center + radius)
 }
 
+#[derive(Clone, Copy)]
+pub struct Coordinates(i32, i32);
+
+#[derive(Clone, Copy)]
 pub struct Circle {
     center_x: i32, 
     center_y: i32, 
