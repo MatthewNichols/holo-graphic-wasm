@@ -21,7 +21,11 @@ struct Pallette {
 impl Pallette {
     pub fn new() -> Pallette {
         Pallette {
-            colors: vec![Color::new(0xff, 0x00, 0xff, 0.3)]
+            colors: vec![
+                Color::new(20, 151, 162, 1.0),
+                Color::new(74, 59, 142, 1.0),
+                Color::new(21, 119, 78, 1.0),
+            ]
         }
     }
 
@@ -42,7 +46,8 @@ impl Pallette {
             random_int_around_point(500, 300), 
             random_int_around_point(500, 250), 
             random_int(0, 60), 
-            Color::new(0xff, 0x00, 0xff, 0.3));
+            self.colors[random_int(0, 2) as usize]
+        );
         c
     }    
 }
@@ -69,6 +74,7 @@ impl Circle {
     }
 }
 
+#[derive(Clone, Copy)]
 pub struct Color {
     red: u8,
     green: u8,
